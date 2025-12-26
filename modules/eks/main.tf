@@ -82,7 +82,6 @@ resource "aws_iam_role_policy_attachment" "node_group_AmazonEC2ContainerRegistry
   role       = aws_iam_role.node_group_role.name
 }
 
-
 data "tls_certificate" "eks" {
   url = aws_eks_cluster.this.identity[0].oidc[0].issuer
 }
