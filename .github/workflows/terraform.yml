@@ -55,8 +55,9 @@ jobs:
   terraform-destroy:
     name: "Terraform Destroy"
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' # Só roda via botão manual
-    environment: development 
+    # Remova o 'needs' se quiser rodar o destroy independente do apply ter rodado antes
+    if: github.event_name == 'workflow_dispatch' 
+    environment: development # Aqui ele vai pedir sua aprovação manual
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
