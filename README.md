@@ -4,7 +4,7 @@
 ![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
 ![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white)
 
-Este repositório contém o código para provisionar uma infraestrutura robusta de **Kubernetes (EKS)** na AWS utilizando **Terraform**. O projeto foi desenhado com foco em modularidade, escalabilidade e seguindo as melhores práticas de rede (VPC Segura).
+Este repositório contém o código para provisionar uma infraestrutura robusta de **Kubernetes (EKS)** na AWS utilizando **Terraform**. O projeto foi desenhado com foco em modularidade, escalabilidade e seguindo as melhores práticas de rede (VPC Segura) e persistência de estado.
 
 ---
 
@@ -12,14 +12,13 @@ Este repositório contém o código para provisionar uma infraestrutura robusta 
 
 A infraestrutura provisionada inclui os seguintes componentes:
 
-* **VPC Customizada:** Isolamento de rede com CIDR específico.
-* **Subnets:**
-    * **Públicas:** Para recursos que precisam de acesso externo (Internet Gateway).
-    * **Privadas:** Onde o cluster EKS reside, protegidas via NAT Gateway.
-* **NAT Gateway:** Permite que recursos nas subnets privadas acessem a internet (updates, patches) sem ficarem expostos.
-* **AWS EKS (Control Plane):** Gerenciamento do Kubernetes com roles IAM específicas.
-* **Security Groups:** Regras restritivas de tráfego.
-
+* **VPC Customizada:** Isolamento de rede com CIDR 10.0.0.0/16.
+* **Subnets:** * **Públicas:** Para Internet Gateway e NAT Gateway.
+    * **Privadas:** Onde reside o Cluster EKS e os Worker Nodes.
+* **NAT Gateway:** Saída segura para internet para recursos em subnets privadas.
+* **AWS EKS (Control Plane):** Cluster gerenciado com suporte a IAM OIDC Provider.
+* **Managed Node Groups:** Instâncias EC2 auto-gerenciáveis (t3.medium).
+* **Remote State:** Persistência de estado no S3 com State Locking via DynamoDB.
 
 ---
 
@@ -29,6 +28,7 @@ A infraestrutura provisionada inclui os seguintes componentes:
 INFRA-AWS-EKS/
 ├── environments/
 │   └── dev/
+│       ├── backend.tf        # Configuração do S3 Backend e DynamoDB Lock
 │       ├── kubernetes.tf     # Configuração específica do provider Kubernetes
 │       ├── main.tf           # Chamada dos módulos (VPC e EKS)
 │       ├── providers.tf      # Configuração do provider AWS
@@ -37,7 +37,7 @@ INFRA-AWS-EKS/
 ├── modules/
 │   ├── eks/
 │   │   ├── auth.tf           # Data sources para autenticação do cluster
-│   │   ├── main.tf           # Recursos do Cluster e Node Group
+│   │   ├── main.tf           # Recursos do Cluster, Node Group e OIDC
 │   │   ├── outputs.tf        # Outputs do cluster (endpoint, ca, etc.)
 │   │   └── variables.tf      # Variáveis necessárias para o EKS
 │   └── vpc/
