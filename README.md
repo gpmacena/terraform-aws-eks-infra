@@ -26,21 +26,23 @@ A infraestrutura provisionada inclui os seguintes componentes:
 ## 📁 Estrutura de Diretórios
 
 ```text
-terraform-aws-eks-infra/
-├── modules/
-│   ├── vpc/                 # Módulo para criação de rede (VPC, Subnets, IGW, NAT)
-│   │   ├── main.tf
-│   │   ├── outputs.tf
-│   │   └── variables.tf
-│   └── eks/                 # Módulo para criação do Cluster Kubernetes
-│       ├── main.tf
-│       ├── outputs.tf
-│       └── variables.tf
+INFRA-AWS-EKS/
 ├── environments/
-│   └── dev/                 # Ambiente de Desenvolvimento
-│       ├── main.tf          # Chamada dos módulos
-│       ├── providers.tf     # Configuração dos provedores AWS e Kubernetes
-│       ├── variables.tf     # Definição de variáveis
-│       └── terraform.tfvars # Valores das variáveis (Ambiente Dev)
-├── .gitignore               # Arquivos ignorados pelo Git
+│   └── dev/
+│       ├── kubernetes.tf     # Configuração específica do provider Kubernetes
+│       ├── main.tf           # Chamada dos módulos (VPC e EKS)
+│       ├── providers.tf      # Configuração do provider AWS
+│       ├── terraform.tfvars  # Definição dos valores das variáveis
+│       └── variables.tf      # Declaração das variáveis do ambiente
+├── modules/
+│   ├── eks/
+│   │   ├── auth.tf           # Data sources para autenticação do cluster
+│   │   ├── main.tf           # Recursos do Cluster e Node Group
+│   │   ├── outputs.tf        # Outputs do cluster (endpoint, ca, etc.)
+│   │   └── variables.tf      # Variáveis necessárias para o EKS
+│   └── vpc/
+│       ├── main.tf           # Recursos de rede (VPC, Subnets, NAT)
+│       ├── outputs.tf        # IDs das subnets e VPC
+│       └── variables.tf      # Variáveis de rede
+├── .gitignore
 └── README.md
