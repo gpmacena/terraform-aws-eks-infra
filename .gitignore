@@ -1,0 +1,72 @@
+############################################
+# Terraform
+############################################
+
+# Diretório de cache do Terraform
+.terraform/
+**/.terraform/*
+
+# State files (NUNCA versionar)
+*.tfstate
+*.tfstate.*
+
+# Plan files
+*.tfplan
+plan.out
+
+# Crash logs
+crash.log
+crash.*.log
+
+############################################
+# Terraform variables (segredos)
+############################################
+
+# Arquivos com variáveis sensíveis
+*.tfvars
+*.tfvars.json
+
+# Override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+############################################
+# AWS
+############################################
+
+# Credenciais locais
+.aws/
+credentials
+config
+
+############################################
+# Kubernetes
+############################################
+
+# Kubeconfig local
+kubeconfig
+*.kubeconfig
+
+############################################
+# IDEs e SO
+############################################
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# IntelliJ / JetBrains
+.idea/
+
+# MacOS
+.DS_Store
+
+# Linux
+*~
+
+############################################
+# Logs
+############################################
+*.log
