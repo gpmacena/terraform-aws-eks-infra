@@ -38,6 +38,7 @@ Diagrama da arquitetura será adicionado em breve.
 
 ## Estrutura do Projeto
 
+```text
 terraform-aws-eks-infra/
 ├── modules/
 │   ├── vpc/
