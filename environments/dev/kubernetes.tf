@@ -8,3 +8,12 @@ provider "kubernetes" {
     command     = "aws"
   }
 }
+
+# Provider Helm para instalar charts (como Nginx, Load Balancer Controller)
+provider "helm" {
+  kubernetes {
+    host                   = module.eks.cluster_endpoint
+    cluster_ca_certificate = base64decode(module.eks.cluster_ca)
+    token                  = module.eks.cluster_token
+  }
+}
