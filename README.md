@@ -3,24 +3,23 @@
 ![Terraform](https://img.shields.io/badge/terraform-%235835CC.svg?style=for-the-badge&logo=terraform&logoColor=white)
 ![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
 ![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/github%20actions-%232671E5.svg?style=for-the-badge&logo=githubactions&logoColor=white)
 
-Este repositório contém o código para provisionar uma infraestrutura robusta de **Kubernetes (EKS)** na AWS utilizando **Terraform**. O projeto segue padrões de nível produção, com foco em modularidade, segurança via IRSA e persistência de estado.
+Este repositório provisiona uma infraestrutura de **Kubernetes (EKS)** de nível produtivo na AWS. O projeto demonstra o uso avançado de **IaC (Terraform)**, automação de **CI/CD** e integração nativa com serviços AWS para exposição de aplicações.
 
 ---
 
-## 🏗️ Arquitetura do Projeto
+## 🏗️ Arquitetura e Diferenciais
 
-A infraestrutura provisionada inclui os seguintes componentes:
+A infraestrutura foi desenhada seguindo o **AWS Well-Architected Framework**:
 
-* **VPC Customizada:** Isolamento de rede com CIDR 10.0.0.0/16.
-* **Subnets:**
-    * **Públicas:** Para Internet Gateway e NAT Gateway.
-    * **Privadas:** Onde reside o Cluster EKS e os Worker Nodes.
-* **NAT Gateway:** Saída segura para internet para recursos em subnets privadas.
-* **AWS EKS (Control Plane):** Cluster gerenciado com suporte a IAM OIDC Provider.
-* **Managed Node Groups:** Instâncias EC2 auto-gerenciáveis (t3.medium).
-* **EKS Managed Add-ons:** Gerenciamento de ciclo de vida do CoreDNS, VPC-CNI e Kube-Proxy.
-* **Remote State:** Persistência de estado no S3 com State Locking via DynamoDB.
+* **Rede de Alta Disponibilidade:** VPC com subnets públicas/privadas em múltiplas AZs e NAT Gateways.
+* **Segurança IRSA (IAM Roles for Service Accounts):** Integração OIDC que permite aos Pods assumirem roles IAM específicas, eliminando a necessidade de chaves fixas.
+* **AWS Load Balancer Controller:** Provisionamento dinâmico de **Application Load Balancers (ALB)** diretamente via manifestos de Ingress.
+* **GitOps & CI/CD:** Pipeline automatizado via **GitHub Actions** com estágios de aprovação manual para o ambiente de `development`.
+* **Aplicação de Teste:** Deploy automatizado de um cluster Nginx escalável, exposto via Ingress para validação de ponta a ponta.
+
+
 
 ---
 
@@ -28,23 +27,16 @@ A infraestrutura provisionada inclui os seguintes componentes:
 
 ```text
 INFRA-AWS-EKS/
+├── .github/workflows/
+│   └── terraform.yml        # Pipeline CI/CD (Plan, Apply, Destroy com Aprovação)
 ├── environments/
 │   └── dev/
-│       ├── backend.tf        # Configuração do S3 Backend e DynamoDB Lock
-│       ├── kubernetes.tf     # Configuração específica do provider Kubernetes
-│       ├── main.tf           # Chamada dos módulos (VPC e EKS)
-│       ├── providers.tf      # Configuração do provider AWS
-│       ├── terraform.tfvars  # Definição dos valores das variáveis
-│       └── variables.tf      # Declaração das variáveis do ambiente
+│       ├── app_test.tf       # Manifestos K8s (Nginx Deployment, Service, Ingress)
+│       ├── backend.tf        # Remote State no S3 + Locking no DynamoDB
+│       ├── main.tf           # Orquestração de Módulos
+│       ├── outputs.tf        # Exibe a URL pública do Nginx após o deploy
+│       └── providers.tf      # Configuração dos provedores AWS, K8s, Helm e HTTP
 ├── modules/
-│   ├── eks/
-│   │   ├── auth.tf           # Data sources para autenticação do cluster
-│   │   ├── main.tf           # Cluster, Node Group, OIDC e Add-ons
-│   │   ├── outputs.tf        # Outputs do cluster (endpoint, ca, etc.)
-│   │   └── variables.tf      # Variáveis necessárias para o EKS
-│   └── vpc/
-│       ├── main.tf           # Recursos de rede (VPC, Subnets, NAT)
-│       ├── outputs.tf        # IDs das subnets e VPC
-│       └── variables.tf      # Variáveis de rede
-├── .gitignore
+│   ├── eks/                  # Módulo de Cluster, Managed Node Groups e IRSA
+│   └── vpc/                  # Módulo de Networking e Tags para ELB
 └── README.md

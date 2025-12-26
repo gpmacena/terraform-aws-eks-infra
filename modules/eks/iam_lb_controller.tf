@@ -17,3 +17,17 @@ resource "aws_iam_role" "aws_lb_controller" {
     }]
   })
 }
+
+data "http" "lb_controller_policy" {
+  url = "https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json"
+}
+
+resource "aws_iam_policy" "lb_controller" {
+  name   = "${var.project_name}-lb-controller-policy"
+  policy = data.http.lb_controller_policy.response_body
+}
+
+resource "aws_iam_role_policy_attachment" "lb_controller_attach" {
+  policy_arn = aws_iam_policy.lb_controller.arn
+  role       = aws_iam_role.aws_lb_controller.name
+}
